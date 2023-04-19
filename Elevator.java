@@ -56,5 +56,50 @@ public class Elevator {
         }
         return false;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    public DisplayState getDisplayState() {
+        return displayState;
+    }
+
+    public void setDisplayState(DisplayState displayState) {
+        this.displayState = displayState;
+    }
+
+    public int getCurrentFloor() {
+        return currentFloor;
+    }
+
+    public void setCurrentFloor(int currentFloor) {
+        this.currentFloor = currentFloor;
+    }
+
+    public List<User> getPassengers() {
+        return passengers;
+    }
+
+    public void addPassenger(User passenger) {
+        passengers.add(passenger);
+    }
+
+    public void removePassenger(User passenger) {
+        passengers.remove(passenger);
+    }
+
+    public int getPassengerCount() {
+        return passengers.size();
+    }
+
 }
 
