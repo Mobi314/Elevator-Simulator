@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class Building {
-    private int floors;
+    private static int floors;
     private int elevators;
     private List<Elevator> elevatorList;
 
@@ -14,7 +14,7 @@ public class Building {
         }
     }
 
-    public int getFloors() {
+    public static int getFloors() {
         return floors;
     }
 
