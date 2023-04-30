@@ -40,34 +40,35 @@ public class Elevator {
     // If elevator has no passengers, it should remain idle
     // Move elevator towards the destination floor of the passengers
     public void move(List<User> users) {
-    if (direction == Direction.UP) {
-        currentFloor++;
-        if (currentFloor == Building.getFloors()) {
-            direction = Direction.DOWN;
-        }
-    } else if (direction == Direction.DOWN) {
-        currentFloor--;
-        if (currentFloor == 1) {
-            direction = Direction.UP;
-        }
-    }
-
+  
     List<User> arrivedPassengers = new ArrayList<>();
     for (User passenger : passengers) {
-        if (passenger.getDestinationFloor() == currentFloor) {
-            arrivedPassengers.add(passenger);
+      if (passenger.getDestinationFloor() == currentFloor) {
+        System.out.println("A Passenger has arrived at floor " + currentFloor);
+        arrivedPassengers.add(passenger);
+      }
+        try {
+            Thread.sleep(500); // 2 second delay for each passenger picked up or dropped off
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
     passengers.removeAll(arrivedPassengers);
 
     List<User> pickedUpUsers = new ArrayList<>();
+    int newWeight = getCurrentWeight();
     for (User user : users) {
         if (user.getStartFloor() == currentFloor && user.getDirection() == direction) {
-            int newWeight = currentWeight + user.getWeight();
-            if (newWeight <= MAX_WEIGHT) {
+          if (newWeight + user.getWeight() <= MAX_WEIGHT) {
+              System.out.println("Elevator has picked up a passenger on floor " + currentFloor);
                 pickedUpUsers.add(user);
                 passengers.add(user);
-                currentWeight = newWeight;
+                newWeight += user.getWeight();
+                try {
+                Thread.sleep(500 * pickedUpUsers.size()); // 2 second delay for each passenger picked up or dropped off
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             }
         }
     }
@@ -81,11 +82,49 @@ public class Elevator {
         int maxFloor = passengers.stream().mapToInt(User::getDestinationFloor).max().getAsInt();
         int minFloor = passengers.stream().mapToInt(User::getDestinationFloor).min().getAsInt();
         if (currentFloor == maxFloor) {
+          System.out.println("Elevator has reached the highest floor and is now going down.");
           direction = Direction.DOWN;
         } else if (currentFloor == minFloor) {
+          System.out.println("Elevator has reached the lowest floor and is now going up.");
           direction = Direction.UP;
         }
       }
+        if (direction == Direction.UP) {
+        currentFloor++;
+        if (currentFloor == Building.getFloors()) {
+            direction = Direction.DOWN;
+            for (int i = currentFloor - 1; i >= 1; i--) {
+                for (User user : users) {
+                    if (user.getStartFloor() == i && user.getDestinationFloor() < i) {
+                        return;
+                    }
+                }
+            }
+        }
+    } else if (direction == Direction.DOWN) {
+        currentFloor--;
+        if (currentFloor == 1) {
+            direction = Direction.UP;
+            for (int i = currentFloor + 1; i <= Building.getFloors(); i++) {
+                for (User user : users) {
+                    if (user.getStartFloor() == i && user.getDestinationFloor() > i) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    
+
+
+
+      try {
+        Thread.sleep(200);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    } 
+
 }
 
 
@@ -147,5 +186,4 @@ public boolean hasUsersToPickup(List<User> users) {
     }
 
 }
-
 
