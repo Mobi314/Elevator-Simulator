@@ -46,17 +46,18 @@ public static List<User> generateUsers(int users, int floors) {
     double mean = 180.0;
     double stddev = 30.0;
     for (int i = 0; i < users; i++) {
-        int startFloor = random.nextInt(floors) + 1;
-        int destinationFloor = random.nextInt(floors) + 1;
-        while (startFloor == destinationFloor) { // ensure start and destination floors are different
-          destinationFloor = random.nextInt(floors) + 1;
-        }
-    int weight = (int) Math.round(random.nextGaussian() * stddev + mean); //uses normal distribution of 180 to find the random weights
-    weight = Math.max(50, Math.min(300, weight)); 
-    userList.add(new User(startFloor, destinationFloor, weight));
-        System.out.println("Destination floor for this user: " + destinationFloor
-              + " Starting floor for this user: " + startFloor);
+      int startFloor = random.nextInt(floors) + 1;
+      int destinationFloor = random.nextInt(floors) + 1;
+      while (startFloor == destinationFloor) { // ensure start and destination floors are different
+        destinationFloor = random.nextInt(floors) + 1;
+      }
+      int weight = (int) Math.round(random.nextGaussian() * stddev + mean); //uses normal distribution of 180 to find the random weights
+      weight = Math.max(50, Math.min(300, weight));
+      userList.add(new User(startFloor, destinationFloor, weight));
+      System.out.println("Destination floor for this user: " + destinationFloor
+          + " Starting floor for this user: " + startFloor);
     }
+    System.out.println("--------------------");
     return userList;
 }
 
