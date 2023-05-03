@@ -3,41 +3,38 @@ import java.util.*;
 
 public class ElevatorSimulator {
   public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
+      Scanner scanner = new Scanner(System.in);
 
-    System.out.print("Enter the number of floors: ");
-    int floors = scanner.nextInt();
+      System.out.print("Enter the number of floors: ");
+      int floors = scanner.nextInt();
 
-    System.out.print("Enter the number of elevators: ");
-    int elevators = scanner.nextInt();
+      System.out.print("Enter the number of elevators: ");
+      int elevators = scanner.nextInt();
 
-    System.out.print("Enter the number of users: ");
-    int users = scanner.nextInt();
+      System.out.print("Enter the number of users: ");
+      int users = scanner.nextInt();
 
-    Building building = new Building(floors, elevators);
-    List<User> userList = generateUsers(users, floors);
+      Building building = new Building(floors, elevators);
+      List<User> userList = generateUsers(users, floors);
 
-    boolean allUsersServiced = false;
-    while (!allUsersServiced) {
-        boolean hasUsersToPickup = false;
+      boolean allUsersServiced = false;
+      while (!allUsersServiced) {
+          boolean hasUsersToPickup = false;
 
-        for (Elevator elevator : building.getElevatorList()) {
-            if (elevator.getDirection() == Direction.NONE && !userList.isEmpty()) {
-                elevator.setDirection(closestUserDirection(elevator, userList));
-            }
+          for (Elevator elevator : building.getElevatorList()) {
+              elevator.processQueues(); // Call processQueues() method for each elevator
 
-            elevator.move(userList);
-            displayFrame(elevator, userList);
+              elevator.move(userList);
+              displayFrame(elevator, userList);
 
-            hasUsersToPickup |= elevator.hasUsersToPickup(userList);
-        }
+              hasUsersToPickup |= elevator.hasUsersToPickup(userList);
+          }
 
-      allUsersServiced = userList.isEmpty() && !hasUsersToPickup && building.getElevatorList().stream()
-                .allMatch(elevator -> elevator.getPassengers().isEmpty());
+          allUsersServiced = userList.isEmpty() && !hasUsersToPickup && building.getElevatorList().stream()
+                  .allMatch(elevator -> elevator.getPassengers().isEmpty());
+      }
 
-    }
-
-    System.out.println("All users have been serviced.");
+      System.out.println("All users have been serviced.");
 }
 
 public static List<User> generateUsers(int users, int floors) {
