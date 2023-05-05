@@ -8,14 +8,12 @@ public class User {
         this.destinationFloor = destinationFloor;
         this.weight = weight;
         
-    if (startFloor > Building.getFloors() || startFloor < 1) {
-        throw new IllegalArgumentException("Invalid start floor");
-    }
-    if (destinationFloor > Building.getFloors() || destinationFloor < 1) {
-        throw new IllegalArgumentException("Invalid destination floor");
-    }
-    this.startFloor = startFloor;
-    this.destinationFloor = destinationFloor;
+        if (startFloor > Building.getFloors() || startFloor < 1) {
+            throw new IllegalArgumentException("Invalid start floor");
+        }
+        if (destinationFloor > Building.getFloors() || destinationFloor < 1) {
+            throw new IllegalArgumentException("Invalid destination floor");
+        }
     }
 
     public int getStartFloor() {
