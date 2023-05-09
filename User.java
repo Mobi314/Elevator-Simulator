@@ -1,4 +1,4 @@
-public class User {
+public class User { //Creates an individual passenger with three values
     private int startFloor;
     private int destinationFloor;
     private int weight;
@@ -7,29 +7,22 @@ public class User {
         this.startFloor = startFloor;
         this.destinationFloor = destinationFloor;
         this.weight = weight;
-        
-        if (startFloor > Building.getFloors() || startFloor < 1) {
-            throw new IllegalArgumentException("Invalid start floor");
-        }
-        if (destinationFloor > Building.getFloors() || destinationFloor < 1) {
-            throw new IllegalArgumentException("Invalid destination floor");
-        }
     }
 
-    public int getStartFloor() {
+    public int getStartFloor() { //starting floor of user
         return startFloor;
     }
 
-    public int getDestinationFloor() {
+    public int getDestinationFloor() { //desintation floor
         return destinationFloor;
     }
 
-    public Direction getDirection() {
+    public Direction getDirection() { //Determins which direction the user needs to head to get to their floor
       return startFloor < destinationFloor ? Direction.UP : Direction.DOWN;
     }
 
 
-    public int getWeight() {
+    public int getWeight() { //user weight
         return weight;
     }
 }
