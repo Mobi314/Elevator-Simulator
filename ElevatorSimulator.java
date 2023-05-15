@@ -1,3 +1,5 @@
+import java.io.FileInputStream;
+import javazoom.jl.player.Player;
 import java.util.*;
 
 public class ElevatorSimulator {
@@ -83,7 +85,16 @@ public class ElevatorSimulator {
       System.out.println("--------------------");
     }
     
-   public static void main(String[] args) {
+    public static void main(String[] args) {
+        new Thread(() -> {
+            try {
+                FileInputStream fileInputStream = new FileInputStream("music/flaing-piano-loop-8782 (mp3cut.net).mp3");
+                Player player = new Player(fileInputStream);
+                player.play();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }).start();
     Scanner scanner = new Scanner(System.in); // creates a scanner for input
 
     int floors = 0;
