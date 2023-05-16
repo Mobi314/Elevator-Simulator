@@ -8,16 +8,18 @@ public class ElevatorSimulator {
     private final int floors;
     private final int elevators;
     private List<User> userList;
+    private boolean fireServiceModeActive;
     
     public ElevatorSimulator(int floors, int elevators) {
         this.floors = floors;
         this.elevators = elevators;
         this.random = new Random();
         userList = new ArrayList<>();
-        
-       
-    } 
-    
+        fireServiceModeActive = false;
+
+
+    }
+
     public void runSimulation() {
       
       Building building = new Building(floors, elevators);
@@ -63,9 +65,30 @@ public class ElevatorSimulator {
           if (userList.isEmpty() && building.getElevatorList().stream().allMatch(Elevator::isEmpty)) {
              break;
       }
-        } 
+      if (!fireServiceModeActive && fireServiceModeActivates()) { //checks for fire service mode and breaks from the loop
+        activateFireServiceMode(building);
+        break;
+    }
+        }
+        if (userList.isEmpty() && building.getElevatorList().stream().allMatch(Elevator::isEmpty) && !fireServiceModeActive) {
+            System.out.println("All users have been serviced.");
+        }
+    }
 
-      System.out.println("All users have been serviced."); //prints out all users have been serviced once it is true
+    private boolean fireServiceModeActivates() {
+        if (fireServiceModeActive) {
+            return false;
+        }
+        double probability = 0.01; // 1% chance for activation
+        return random.nextDouble() < probability;
+    }
+
+    private void activateFireServiceMode(Building building) {
+        fireServiceModeActive = true;
+        for (Elevator elevator : building.getElevatorList()) { //this will move all the elevators to floor 1
+            elevator.moveToFloor(1);
+        }
+        System.out.println("Fire service mode activated. All elevators will now move to the first floor.");
     }
 
     private void generateRandomUser() {
@@ -112,21 +135,23 @@ private Elevator getAssignedElevator(User user) {
     
     return closestElevator;
 }
+public boolean isFireServiceModeActive() {
+    return fireServiceModeActive;
+}
 
 
 
 
-    
 public static void main(String[] args) {
-     new Thread(() -> {
-            try {
-                FileInputStream fileInputStream = new FileInputStream("music/flaing-piano-loop-8782 (mp3cut.net).mp3");
-                Player player = new Player(fileInputStream);
-                player.play();
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }).start();
+    new Thread(() -> {
+        try {
+            FileInputStream fileInputStream = new FileInputStream("music/glass-of-wine-143532.mp3");
+            Player player = new Player(fileInputStream);
+            player.play();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }).start();
     Scanner scanner = new Scanner(System.in); // creates a scanner for input
 
     int floors = 0;
@@ -174,6 +199,7 @@ public static void main(String[] args) {
 
     ElevatorSimulator simulator = new ElevatorSimulator(floors, elevators); // creates a new simulator based off the values, and runs the simulation
     simulator.runSimulation();
+    System.exit(0);
 }
 
 
