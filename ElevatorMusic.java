@@ -2,16 +2,16 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import javazoom.jl.player.Player;
 
-public class AudioPlayer {
+public class ElevatorMusic {
     private String filename;
     private Player player; 
-    public AudioPlayer(String filename) {
+    public ElevatorMusic(String filename) {
         this.filename = filename;
     }
     public void close() { if (player != null) player.close(); }
     public void play() {
         try {
-            FileInputStream fis     = new FileInputStream(filename);
+            FileInputStream fis = new FileInputStream(filename);
             BufferedInputStream bis = new BufferedInputStream(fis);
             player = new Player(bis);
         }
