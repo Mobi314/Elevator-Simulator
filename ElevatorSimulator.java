@@ -2,91 +2,123 @@ import java.io.FileInputStream;
 import javazoom.jl.player.Player;
 import java.util.*;
 
+
 public class ElevatorSimulator {
     private final Random random;
     private final int floors;
     private final int elevators;
-    private final int users;
+    private List<User> userList;
     
-    public ElevatorSimulator(int floors, int elevators, int users) {
+    public ElevatorSimulator(int floors, int elevators) {
         this.floors = floors;
         this.elevators = elevators;
-        this.users = users;
         this.random = new Random();
+        userList = new ArrayList<>();
+        
+       
     } 
     
     public void runSimulation() {
-        Building building = new Building(floors, elevators); //Creates a new building
-        List<User> userList = generateUsers(users, floors); //Creates a new list for all generated users
+      
+      Building building = new Building(floors, elevators);
+      generateRandomUser();
+      generateRandomUser();
+      generateRandomUser();
+      generateRandomUser();
+      generateRandomUser();
 
-        boolean allUsersServiced = false; //We check if all users have been serviced in the elevator
-        while (!allUsersServiced) {  
-            boolean hasUsersToPickup = false;
-
-            for (Elevator elevator : building.getElevatorList()) { //runs for each elevator in the building
-                elevator.processQueues(); // Call processQueues() method for each elevator
-
-                elevator.move(userList);
-                displayFrame(elevator, userList);
-
-                hasUsersToPickup = elevator.hasUsersToPickup(userList);
-            }
-
-            allUsersServiced = userList.isEmpty() && !hasUsersToPickup && building.getElevatorList().stream() //checks if there are no users to pickup and the elevators are empty. If they are empty, allUsersServiced becomes true
-                    .allMatch(Elevator::isEmpty);
-        }
-
-        System.out.println("All users have been serviced."); //prints out all users have been serviced once it is true
+      boolean allUsersServiced = false; //We check if all users have been serviced in the elevator
+      while (!allUsersServiced) {
+        List<String> elevatorStatusList = new ArrayList<>();
+        for (Elevator elevator : building.getElevatorList()) {
+          String elevatorStatus = "Elevator " + elevator.getId() + ": ";
+          elevatorStatus += "Direction: " + elevator.getDirection() + " | ";
+          elevatorStatus += "Current Floor: " + elevator.getCurrentFloor() + " | ";
+          elevatorStatus += "Passengers waiting: " + userList.size() + " | ";
+          elevatorStatus += "Passengers in elevator: " + elevator.getPassengerCount() + " | ";
+          elevatorStatus += "Total weight: " + elevator.getCurrentWeight() + " | ";
+          elevatorStatusList.add(elevatorStatus);
     }
 
-    private List<User> generateUsers(int users, int floors) { //method to generate random users for the elevator
-        List<User> userList = new ArrayList<>(); //create a new list to hold all generated users
-        double mean = 180.0;
-        double stddev = 30.0; //values used for random weights via normal distribution
-        for (int i = 0; i < users; i++) { //iterates through every user requested
-            int startFloor = random.nextInt(floors) + 1; //gives each user a random starting floor
-            int destinationFloor = random.nextInt(floors) + 1; //gives each user a random destination floor
-            while (startFloor == destinationFloor) { // ensure start and destination floors are different
-                destinationFloor = random.nextInt(floors) + 1;
-            }
-            int weight = (int) Math.round(random.nextGaussian() * stddev + mean); //uses normal distribution of 180 to find the random weights
-            weight = Math.max(50, Math.min(300, weight)); //math stuff
-            userList.add(new User(startFloor, destinationFloor, weight)); //adds the generated user with their values to the list
-            System.out.println("Destination floor for this user: " + destinationFloor
-                    + " Starting floor for this user: " + startFloor);
-        }
-        System.out.println("--------------------");
-        return userList; //when finished with all users, returns the list
+    // Print elevator status side by side
+    for (String elevatorStatus : elevatorStatusList) {
+        System.out.println(elevatorStatus);
     }
+    System.out.println("-----------------------------------------------------------------------------");
+          
+        int randomNumber = random.nextInt(10);
+          if (randomNumber > 5) {
+            generateRandomUser();
+          }
 
-    public static Direction closestUserDirection(Elevator elevator, List<User> userList) { //unused method work in progress
-        int minDistance = Integer.MAX_VALUE;
-        Direction closestDirection = Direction.NONE;
+        for (Elevator elevator : building.getElevatorList()) { //runs for each elevator in the building
+          elevator.processQueue(); // Call processQueues() method for each elevator
 
-        for (User user : userList) {
-            int distance = Math.abs(elevator.getCurrentFloor() - user.getStartFloor());
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestDirection = user.getDirection();
-            }
+      
+         // displayFrame(elevator, userList);
+          elevator.move(userList);
+
         }
 
-        return closestDirection;
+          if (userList.isEmpty() && building.getElevatorList().stream().allMatch(Elevator::isEmpty)) {
+             break;
+      }
+        } 
+
+      System.out.println("All users have been serviced."); //prints out all users have been serviced once it is true
     }
 
-    public static void displayFrame(Elevator elevator, List<User> userList) { //display frame printing all info needed while program runs
-      System.out.println("Elevator ID: " + elevator.getId());
-      System.out.println("Direction: " + elevator.getDirection());
-      //System.out.println("DisplayState: " + elevator.getDisplayState());
-      System.out.println("CurrentFloor: " + elevator.getCurrentFloor());
-      System.out.println("Users in elevator: " + elevator.getPassengerCount());
-      System.out.println("Users waiting: " + userList.size());
-      System.out.println("Total weight: " + elevator.getCurrentWeight());
-      System.out.println("--------------------");
+    private void generateRandomUser() {
+      double mean = 180.0;
+      double stddev = 30.0; //values used for random weights via normal distribution
+      int startFloor = random.nextInt(floors) + 1; //gives each user a random starting floor
+      int destinationFloor = random.nextInt(floors) + 1; //gives each user a random destination floor
+      while (startFloor == destinationFloor) { // ensure start and destination floors are different
+        destinationFloor = random.nextInt(floors) + 1;
+      }
+      int weight = (int) Math.round(random.nextGaussian() * stddev + mean); //uses normal distribution of 180 to find the random weights
+      weight = Math.max(50, Math.min(300, weight)); //math stuff
+      User user = new User(startFloor, destinationFloor, weight); //adds the generated user with their values to the list
+      Elevator assignedElevator = getAssignedElevator(user);
+      user.setAssignedElevator(assignedElevator);
+      // Add the user to the assigned elevator's passengers list
+      assignedElevator.getPassengers().add(user);
+      System.out.println("A new user has called the elevator!");
+      System.out.println("Starting floor for this user: " + startFloor
+          + " Destination floor for this user: " + destinationFloor);
+      System.out.println("-----------------------------------------------------------------------------");
+      userList.add(user); //when finished with all users, returns the list
+     // System.out.println("Current users in list: " + userList);
+
+    }
+
+   private Elevator getElevator(int elevatorId) {
+    return new Elevator(elevatorId); // Create a new Elevator object with the specified ID
+}
+
+private Elevator getAssignedElevator(User user) {
+    int minDistance = Integer.MAX_VALUE;
+    Elevator closestElevator = null;
+    
+    for (int i = 1; i <= elevators; i++) {
+        Elevator elevator = getElevator(i);
+        int distance = Math.abs(elevator.getCurrentFloor() - user.getStartFloor());
+        
+        if (distance < minDistance && elevator.getPassengers().isEmpty()) {
+            minDistance = distance;
+            closestElevator = elevator;
+        }
     }
     
-    public static void main(String[] args) {
-        new Thread(() -> {
+    return closestElevator;
+}
+
+
+
+
+    
+public static void main(String[] args) {
+     new Thread(() -> {
             try {
                 FileInputStream fileInputStream = new FileInputStream("music/flaing-piano-loop-8782 (mp3cut.net).mp3");
                 Player player = new Player(fileInputStream);
@@ -113,21 +145,22 @@ public class ElevatorSimulator {
 
     int elevators = 0; //same logic as above
     while (elevators <= 0) {
-        System.out.print("Enter the number of elevators (positive integer only): ");
-        if (scanner.hasNextInt()) {
-            elevators = scanner.nextInt();
-            if (elevators <= 0) {
-                System.out.println("Please enter a positive integer.");
-            }
-        } else {
-            System.out.println("Please enter a positive integer.");
-            scanner.next();
+      System.out.print("Enter the number of elevators (positive integer only): ");
+      if (scanner.hasNextInt()) {
+        elevators = scanner.nextInt();
+        if (elevators <= 0) {
+          System.out.println("Please enter a positive integer.");
         }
+      } else {
+        System.out.println("Please enter a positive integer.");
+        scanner.next();
+      }
     }
+    System.out.println();
 
-    int users = 0; //same logic as above
+   /*  int users = 0; //same logic as above
     while (users <= 0) {
-        System.out.print("Enter the number of users (positive integer only): ");
+        System.out.print("Enter the number of initial users (positive integer only): ");
         if (scanner.hasNextInt()) {
             users = scanner.nextInt();
             if (users <= 0) {
@@ -137,9 +170,9 @@ public class ElevatorSimulator {
             System.out.println("Please enter a positive integer.");
             scanner.next();
         }
-    }
+    } */
 
-    ElevatorSimulator simulator = new ElevatorSimulator(floors, elevators, users); // creates a new simulator based off the values, and runs the simulation
+    ElevatorSimulator simulator = new ElevatorSimulator(floors, elevators); // creates a new simulator based off the values, and runs the simulation
     simulator.runSimulation();
 }
 
