@@ -2,6 +2,7 @@ public class User { //Creates an individual passenger with three values
     private int startFloor;
     private int destinationFloor;
     private int weight;
+    private Elevator assignedElevator;
 
     public User(int startFloor, int destinationFloor, int weight) {
         this.startFloor = startFloor;
@@ -21,6 +22,13 @@ public class User { //Creates an individual passenger with three values
       return startFloor < destinationFloor ? Direction.UP : Direction.DOWN;
     }
 
+    public Elevator getAssignedElevator() {
+      return assignedElevator;
+    }
+    
+    public void setAssignedElevator(Elevator elevator) {
+        this.assignedElevator = elevator;
+    }
 
     public int getWeight() { //user weight
         return weight;
