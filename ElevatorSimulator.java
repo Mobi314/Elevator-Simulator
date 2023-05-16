@@ -8,6 +8,7 @@ public class ElevatorSimulator {
     private final int floors;
     private final int elevators;
     public List<User> userList;
+    private boolean fireServiceModeActive;
     
     
     public ElevatorSimulator(int floors, int elevators) {
@@ -15,6 +16,7 @@ public class ElevatorSimulator {
       this.elevators = elevators;
       this.random = new Random();
       userList = new ArrayList<>();
+      fireServiceModeActive = false;
 
     }
     
@@ -58,12 +60,32 @@ public class ElevatorSimulator {
 
           if (userList.isEmpty() && building.getElevatorList().stream().allMatch(Elevator::isEmpty)) { //If there are no users left, exit the loop
              break;
-      }
-        } 
-
-      System.out.println("All users have been serviced."); //prints out all users have been serviced once it is true
+      }   
+      if (!fireServiceModeActive && fireServiceModeActivates()) { //checks for fire service mode and breaks from the loop
+        activateFireServiceMode(building);
+        break;
+    }
+        }
+        if (userList.isEmpty() && building.getElevatorList().stream().allMatch(Elevator::isEmpty) && !fireServiceModeActive) {//prints out all users have been serviced once it is true
+            System.out.println("All users have been serviced.");
+        }
+    }
+    private boolean fireServiceModeActivates() {
+        if (fireServiceModeActive) {
+            return false;
+        }
+        double probability = 0.01; // 1% chance for activation
+        return random.nextDouble() < probability;
     }
 
+    private void activateFireServiceMode(Building building) {
+        fireServiceModeActive = true;
+        for (Elevator elevator : building.getElevatorList()) { //this will move all the elevators to floor 1
+            elevator.moveToFloor(1);
+        }
+        System.out.println("Fire service mode activated. All elevators will now move to the first floor.");
+    }
+   
     private void generateRandomUser() {
       double mean = 180.0;
       double stddev = 30.0; //values used for random weights via normal distribution
@@ -118,6 +140,7 @@ private Elevator getAssignedElevator(User user) {
     }
     
     return getElevator(1);
+  
      
 }
 
@@ -126,9 +149,9 @@ private Elevator getAssignedElevator(User user) {
 
     
 public static void main(String[] args) {
-     new Thread(() -> {
+     new Thread(() -> {//plays music file
             try {
-                FileInputStream fileInputStream = new FileInputStream("music/flaing-piano-loop-8782 (mp3cut.net).mp3");
+                FileInputStream fileInputStream = new FileInputStream("music/glass-of-wine-143532.mp3");
                 Player player = new Player(fileInputStream);
                 player.play();
             } catch (Exception e) {
@@ -168,6 +191,7 @@ public static void main(String[] args) {
 
     ElevatorSimulator simulator = new ElevatorSimulator(floors, elevators); // creates a new simulator based off the values, and runs the simulation
     simulator.runSimulation();
+    System.exit(0);
 }
 
 
